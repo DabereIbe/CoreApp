@@ -1,0 +1,67 @@
+﻿@model CoreApp.Models.Orders
+
+@{
+    ViewData["Title"] = "ViewOrder";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<div>
+    <h4>Orders</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Order Id
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class="col-sm-2">
+            Customer Name
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Amount)
+        </dt>
+        <dd class="col-sm-10">
+           $ @Html.DisplayFor(model => model.Amount)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt class="col-sm-2">
+            Transaction Reference
+        </dt>
+        @if (Model.TransactionRef != null)
+        {
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TransactionRef)
+            </dd>
+        }
+        else
+        {
+            <dd class="col-sm-10">
+                Empty
+            </dd>
+        }
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedAt)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedAt)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Orders">Back</a>
+</div>
+<div>
+    <a class="btn btn-danger" asp-controller="Admin" asp-action="DeleteOrder" asp-route-id="@Model.Id">Delete</a>
+</div>

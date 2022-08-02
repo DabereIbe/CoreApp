@@ -1,0 +1,16 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="container mt-3">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <h1>Welcome to your Dashboard, @UserManager.GetUserName(User)</h1>
+    }
+</div>
+
