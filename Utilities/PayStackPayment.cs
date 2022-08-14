@@ -37,7 +37,7 @@ namespace CoreApp.Utilities
                 Email = Email,
                 Reference = Guid.NewGuid().ToString(),
                 Currency = "NGN",
-                CallbackUrl = "https://localhost:44392/Cart/Verify"
+                CallbackUrl = "~/Cart/Verify"
             };
 
             TransactionInitializeResponse response = PayStack.Transactions.Initialize(request);
