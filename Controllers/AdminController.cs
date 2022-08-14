@@ -136,7 +136,7 @@ namespace CoreApp.Controllers
             {
                 string upload = webRootPath + WC.ImagePath;
                 string fileName = Guid.NewGuid().ToString();
-                string extension = Path.GetExtension(file.FileName);
+                string extension = Path.GetExtension(file.FileName).ToLower();
 
                 using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
                 {
