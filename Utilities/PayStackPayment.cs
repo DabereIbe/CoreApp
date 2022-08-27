@@ -29,7 +29,7 @@ namespace CoreApp.Utilities
             PayStack = new PayStackApi(_paymentModel.SecretKey);
         }
 
-        public Task InitializePayment(int Amount, string Email, string Name, string Address, string fileName)
+        public Task InitializePayment(int Amount, string Email, string Name, string Address)
         {
             var request = new TransactionInitializeRequest()
             {

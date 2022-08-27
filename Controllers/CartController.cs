@@ -27,6 +27,7 @@ namespace CoreApp.Controllers
         private readonly IEmailSender _emailSender;
         private readonly PayStackPayment _payment;
         private readonly InquiryGenerator _inquiry;
+        private readonly CloudinaryUpload _upload;
 
         [BindProperty]
         public ProductUserVM ProductUserVM { get; set; }
@@ -34,13 +35,15 @@ namespace CoreApp.Controllers
             IWebHostEnvironment webHostEnvironment, 
             IEmailSender emailSender, 
             PayStackPayment payment,
-            InquiryGenerator inquiry)
+            InquiryGenerator inquiry,
+            CloudinaryUpload upload)
         {
             _db = db;
             _payment = payment;
             _webHostEnvironment = webHostEnvironment;
             _emailSender = emailSender;
             _inquiry = inquiry;
+            _upload = upload;
 
         }
         public IActionResult Index()
@@ -113,7 +116,7 @@ namespace CoreApp.Controllers
             //Initializes Payment with Paystack
             if (ProductUserVM.PayOnline == true)
             {
-                await _payment.InitializePayment(Amount, Email, Name, Address, _inquiry.FileName);
+                await _payment.InitializePayment(Amount, Email, Name, Address);
                 if (_payment.AuthorizationUrl != null)
                 {
                     return Redirect(_payment.AuthorizationUrl);
@@ -140,7 +143,7 @@ namespace CoreApp.Controllers
             StringBuilder productList = new StringBuilder();
             foreach (var prod in ProductUserVM.ProductList)
             {
-                productList.Append($" - Name: { prod.Name} <span style='font-size:14px;'> (${prod.Price}) </span><br />");
+                productList.Append($" - Name: { prod.Name} <span style='font-size:14px;'> (&#8358;{prod.Price.ToString("n")}) </span><br />");
             }
 
             _inquiry.GenerateAdminInquiry(Name, Email, PhoneNumber, Address, productList.ToString());
@@ -150,7 +153,6 @@ namespace CoreApp.Controllers
             //Saves Inquiry in HTML file
             string path = _webHostEnvironment.WebRootPath + @"\Inquiries\" + _inquiry.FileName;
             System.IO.File.WriteAllText(path, _inquiry.MessageBody);
-            
 
             //Initialize HTML to PDF converter 
             HtmlToPdfConverter htmlConverter = new HtmlToPdfConverter(HtmlRenderingEngine.WebKit);
@@ -166,13 +168,15 @@ namespace CoreApp.Controllers
             //Convert URL to PDF
             PdfDocument document = htmlConverter.Convert(path);
 
+            string pdfFilePath = _webHostEnvironment.WebRootPath + @"\Inquiries\" + _inquiry.PdfFileName;
 
             //Saving the PDF to the FileStream
-            using (var fileStream = new FileStream(Path.Combine(path), FileMode.Create))
+            using (var fileStream = new FileStream(Path.Combine(pdfFilePath), FileMode.Create))
             {
                 document.Save(fileStream);
             }
 
+            await _upload.InvoiceUpload(pdfFilePath);
 
             //Sends Email To Admin
             await _emailSender.SendEmailAsync(WC.EmailAdmin, subject, _inquiry.MessageBody);

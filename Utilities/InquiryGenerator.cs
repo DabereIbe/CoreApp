@@ -21,6 +21,7 @@ namespace CoreApp.Utilities
         public string MessageBody { get; set; }
         public string CustomerMessageBody { get; set; }
         public string FileName { get; set; }
+        public string PdfFileName { get; set; }
 
         public void GenerateAdminInquiry(string name, string email, string phoneNumber, string address, string productList)
         {
@@ -64,7 +65,8 @@ namespace CoreApp.Utilities
                 HtmlBody = sr.ReadToEnd();
             }
 
-            
+            string pdfFileName = Path.GetFileNameWithoutExtension(FileName) + ".pdf";
+            PdfFileName = pdfFileName;
             string messageBody = string.Format(HtmlBody,
                 name,
                 email,
@@ -72,7 +74,7 @@ namespace CoreApp.Utilities
                 DateTime.Now.ToString(),
                 productList,
                 address,
-                FileName);
+                PdfFileName);
             CustomerMessageBody = messageBody;
         }
     }

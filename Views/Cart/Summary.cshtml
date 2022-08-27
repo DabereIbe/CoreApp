@@ -99,7 +99,7 @@
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <div>
                                                     <h6 class="my-0">@Model.ProductList[i].Name</h6>
-                                                    <small class="text-muted">Price: $@Model.ProductList[i].Price</small>
+                                                    <small class="text-muted">Price: &#8358;@Model.ProductList[i].Price.ToString("n")</small>
                                                 </div>
                                             </li>
                                             Total = Total + Convert.ToInt32(Model.ProductList[i].Price);
@@ -111,7 +111,7 @@
                                     <div class="col-12">
                                         <h4 class="d-flex justify-content-between align-items-center mb-3">
                                             <input type="hidden" asp-for="Amount" value="@Convert.ToInt32(ViewData["Total"])" />
-                                            <span class="text-info">Total: $@Total</span>
+                                            <span class="text-info">Total: &#8358;@Total.ToString("n")</span>
                                         </h4>
                                     </div>
                                 </div>

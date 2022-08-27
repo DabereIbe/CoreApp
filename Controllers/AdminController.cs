@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CoreApp.Data;
 using CoreApp.Models;
+using CoreApp.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -19,11 +20,13 @@ namespace CoreApp.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly CloudinaryUpload _upload;
 
-        public AdminController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment)
+        public AdminController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, CloudinaryUpload upload)
         {
             _db = db;
             _webHostEnvironment = webHostEnvironment;
+            _upload = upload;
         }
 
         public List<SelectListItem> GetCategory()
@@ -132,22 +135,21 @@ namespace CoreApp.Controllers
         public IActionResult CreateProduct(Product obj, IFormFile file)
         {
             string webRootPath = _webHostEnvironment.WebRootPath;
-            if (obj.Id > 0)
+            
+            string upload = webRootPath + WC.ImagePath;
+            string fileName = Guid.NewGuid().ToString();
+            string extension = Path.GetExtension(file.FileName);
+            string filepath = Path.Combine(upload, fileName + extension);
+
+            using (var fileStream = new FileStream(filepath, FileMode.Create))
             {
-                string upload = webRootPath + WC.ImagePath;
-                string fileName = Guid.NewGuid().ToString();
-                string extension = Path.GetExtension(file.FileName).ToLower();
-
-                using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
-                {
-                    file.CopyTo(fileStream);
-                }
-
-                obj.Image = fileName + extension;
-
+                file.CopyTo(fileStream);
             }
 
+            _upload.FileUpload(filepath);
 
+            obj.Image = fileName + extension;
+            
             _db.Product.Add(obj);
             _db.SaveChanges();
             return RedirectToAction("Products");
@@ -180,18 +182,21 @@ namespace CoreApp.Controllers
                 string upload = webRootPath + WC.ImagePath;
                 string fileName = Guid.NewGuid().ToString();
                 string extension = Path.GetExtension(file.FileName);
+                string filepath = Path.Combine(upload, fileName + extension);
 
-                var oldFile = Path.Combine(upload, objFromDb.Image);
+                //var oldFile = Path.Combine(upload, objFromDb.Image);
 
-                if (System.IO.File.Exists(oldFile))
-                {
-                    System.IO.File.Delete(oldFile);
-                }
+                //if (System.IO.File.Exists(oldFile))
+                //{
+                //    System.IO.File.Delete(oldFile);
+                //}
 
-                using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
+                using (var fileStream = new FileStream(filepath, FileMode.Create))
                 {
                     file.CopyTo(fileStream);
                 }
+
+                _upload.FileUpload(filepath);
 
                 obj.Image = fileName + extension;
             }
@@ -231,12 +236,12 @@ namespace CoreApp.Controllers
             {
                 return NotFound();
             }
-            var oldFile = Path.Combine(upload, objFromDb.Image);
+            //var oldFile = Path.Combine(upload, objFromDb.Image);
 
-            if (System.IO.File.Exists(oldFile))
-            {
-                System.IO.File.Delete(oldFile);
-            }
+            //if (System.IO.File.Exists(oldFile))
+            //{
+            //    System.IO.File.Delete(oldFile);
+            //}
             _db.Product.Remove(obj);
             _db.SaveChanges();
             return RedirectToAction("Products");
