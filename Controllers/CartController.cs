@@ -113,32 +113,7 @@ namespace CoreApp.Controllers
 
             var subject = "New Inquiry";
 
-            //Initializes Payment with Paystack
-            if (ProductUserVM.PayOnline == true)
-            {
-                await _payment.InitializePayment(Amount, Email, Name, Address);
-                if (_payment.AuthorizationUrl != null)
-                {
-                    return Redirect(_payment.AuthorizationUrl);
-                }
-                else
-                {
-                    ViewData["Error"] = _payment.Message;
-                    return View();
-                }
-            }
-            else
-            {
-                var orderModel = new Orders()
-                {
-                    Name = Name,
-                    Amount = Amount,
-                    Email = Email,
-                    Address = ProductUserVM.AppUser.Address,
-                };
-                await _db.Orders.AddAsync(orderModel);
-                await _db.SaveChangesAsync();
-            }
+            
 
             StringBuilder productList = new StringBuilder();
             foreach (var prod in ProductUserVM.ProductList)
@@ -176,7 +151,7 @@ namespace CoreApp.Controllers
                 document.Save(fileStream);
             }
 
-            await _upload.InvoiceUpload(pdfFilePath);
+            //await _upload.InvoiceUpload(pdfFilePath);
 
             //Sends Email To Admin
             await _emailSender.SendEmailAsync(WC.EmailAdmin, subject, _inquiry.MessageBody);
@@ -184,8 +159,33 @@ namespace CoreApp.Controllers
             //Sends Email To Buyer
             await _emailSender.SendEmailAsync(Email, subject, _inquiry.CustomerMessageBody);
 
-            
-            
+            //Initializes Payment with Paystack
+            if (ProductUserVM.PayOnline == true)
+            {
+                await _payment.InitializePayment(Amount, Email, Name, Address);
+                if (_payment.AuthorizationUrl != null)
+                {
+                    return Redirect(_payment.AuthorizationUrl);
+                }
+                else
+                {
+                    ViewData["Error"] = _payment.Message;
+                    return View();
+                }
+            }
+            else
+            {
+                var orderModel = new Orders()
+                {
+                    Name = Name,
+                    Amount = Amount,
+                    Email = Email,
+                    Address = ProductUserVM.AppUser.Address,
+                };
+                await _db.Orders.AddAsync(orderModel);
+                await _db.SaveChangesAsync();
+            }
+
             return RedirectToAction(nameof(InquiryConfirmation));
         }
 

@@ -37,7 +37,8 @@ namespace CoreApp.Utilities
                 Email = Email,
                 Reference = Guid.NewGuid().ToString(),
                 Currency = "NGN",
-                CallbackUrl = "http://www.watchstop.herokuapp.com/Cart/Verify"
+                CallbackUrl = "https://localhost:5001/Cart/Verify"
+                //CallbackUrl = "http://www.watchstop.com/Cart/Verify"
             };
 
             TransactionInitializeResponse response = PayStack.Transactions.Initialize(request);

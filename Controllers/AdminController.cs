@@ -146,7 +146,7 @@ namespace CoreApp.Controllers
                 file.CopyTo(fileStream);
             }
 
-            _upload.FileUpload(filepath);
+            //_upload.FileUpload(filepath);
 
             obj.Image = fileName + extension;
             
@@ -184,19 +184,19 @@ namespace CoreApp.Controllers
                 string extension = Path.GetExtension(file.FileName);
                 string filepath = Path.Combine(upload, fileName + extension);
 
-                //var oldFile = Path.Combine(upload, objFromDb.Image);
+                var oldFile = Path.Combine(upload, objFromDb.Image);
 
-                //if (System.IO.File.Exists(oldFile))
-                //{
-                //    System.IO.File.Delete(oldFile);
-                //}
+                if (System.IO.File.Exists(oldFile))
+                {
+                    System.IO.File.Delete(oldFile);
+                }
 
                 using (var fileStream = new FileStream(filepath, FileMode.Create))
                 {
                     file.CopyTo(fileStream);
                 }
 
-                _upload.FileUpload(filepath);
+                //_upload.FileUpload(filepath);
 
                 obj.Image = fileName + extension;
             }
@@ -236,12 +236,12 @@ namespace CoreApp.Controllers
             {
                 return NotFound();
             }
-            //var oldFile = Path.Combine(upload, objFromDb.Image);
+            var oldFile = Path.Combine(upload, objFromDb.Image);
 
-            //if (System.IO.File.Exists(oldFile))
-            //{
-            //    System.IO.File.Delete(oldFile);
-            //}
+            if (System.IO.File.Exists(oldFile))
+            {
+                System.IO.File.Delete(oldFile);
+            }
             _db.Product.Remove(obj);
             _db.SaveChanges();
             return RedirectToAction("Products");
